@@ -47,7 +47,8 @@
                    [style.margin.px]="imageMargin">
             </td>
             <td>
-              <a>
+              <a [routerLink]="['/products', product.id]"
+                  [queryParams]="{filterBy: listFilter, showImage: showImage}" >
                 {{ product.productName }}
               </a>
             </td>
@@ -59,7 +60,8 @@
               </pm-star>
             </td>
             <td>
-              <button class="btn btn-outline-primary btn-sm">
+              <button [routerLink]="['/products', product.id, 'edit']"
+                      class="btn btn-outline-primary btn-sm">
                 Edit
               </button>
             </td>

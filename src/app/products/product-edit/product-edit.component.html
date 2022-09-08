@@ -77,7 +77,8 @@
                   (click)="saveProduct()">
             Save
           </button>
-          <button class="btn btn-outline-secondary mr-3"
+          <button [routerLink]="['/products']"
+                  class="btn btn-outline-secondary mr-3"
                   style="width:80px"
                   type="button"
                   title="Cancel your edits">

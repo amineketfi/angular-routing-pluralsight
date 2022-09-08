@@ -1,29 +1,38 @@
-import { Component } from '@angular/core';
+import { HttpParams } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { MessageService } from '../../messages/message.service';
 
-import { Product } from '../product';
+import { Product, ProductResolved } from '../product';
 import { ProductService } from '../product.service';
 
 @Component({
   templateUrl: './product-edit.component.html',
   styleUrls: ['./product-edit.component.css']
 })
-export class ProductEditComponent {
+export class ProductEditComponent implements OnInit {
   pageTitle = 'Product Edit';
   errorMessage: string;
 
   product: Product;
 
-  constructor(private productService: ProductService,
-              private messageService: MessageService) { }
+  constructor(
+    private productService: ProductService,
+    private messageService: MessageService,
+    private route: ActivatedRoute,
+    private router: Router
+    ) { }
 
-  getProduct(id: number): void {
-    this.productService.getProduct(id).subscribe({
-      next: product => this.onProductRetrieved(product),
-      error: err => this.errorMessage = err
-    });
+  ngOnInit(): void {
+    this.route.data.subscribe(data => {
+      const resolvedData: ProductResolved = data['resolvedData'];
+      this.errorMessage = resolvedData.error;
+      this.onProductRetrieved(resolvedData.product);
+    })
+
   }
+
 
   onProductRetrieved(product: Product): void {
     this.product = product;
@@ -77,5 +86,9 @@ export class ProductEditComponent {
     }
 
     // Navigate back to the product list
+    setTimeout(()=> {
+      this.router.navigateByUrl('/products');
+    }, 200);
+
   }
 }
