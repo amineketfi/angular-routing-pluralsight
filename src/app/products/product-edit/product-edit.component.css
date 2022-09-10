@@ -73,3 +73,7 @@
 .wizard .active:after {
     border-left-color: #007ACC;
 }
+
+.bi.bi-exclamation-circle {
+  color: rgb(196, 0, 0);
+}

@@ -1,4 +1,3 @@
-import { HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -15,7 +14,30 @@ export class ProductEditComponent implements OnInit {
   pageTitle = 'Product Edit';
   errorMessage: string;
 
-  product: Product;
+  // Properties associated with canDesactivate guard
+  private currentProduct: Product;
+  private originalProduct: Product;
+
+  // getter and setter for current product data in the form
+  get product(): Product {
+    return this.currentProduct;
+  }
+
+  set product(value: Product) {
+    this.currentProduct = value;
+    //Clone the object to retain a copy
+    this.originalProduct = { ...value };
+  }
+
+
+  // Tracker for data validation in child forms
+  private dataIsValid: {[key:string]: boolean}= {};
+
+  get isDirty() {
+    // not a good practice
+    return JSON.stringify(this.originalProduct) !== JSON.stringify(this.currentProduct);
+  }
+
 
   constructor(
     private productService: ProductService,
@@ -31,6 +53,16 @@ export class ProductEditComponent implements OnInit {
       this.onProductRetrieved(resolvedData.product);
     })
 
+  }
+
+  // check form validation in child components
+  isValid(path?: string): boolean {
+    this.validate();
+    if(path) {
+      return this.dataIsValid[path];
+    }
+    return (this.dataIsValid &&
+      Object.keys(this.dataIsValid).every( d => this.dataIsValid[d] === true))
   }
 
 
@@ -62,6 +94,13 @@ export class ProductEditComponent implements OnInit {
     }
   }
 
+  reset() {
+    this.dataIsValid = null;
+    this.currentProduct = null;
+    this.originalProduct = null;
+  }
+
+
   saveProduct(): void {
     if (true === true) {
       if (this.product.id === 0) {
@@ -84,11 +123,29 @@ export class ProductEditComponent implements OnInit {
     if (message) {
       this.messageService.addMessage(message);
     }
-
+    this.reset();
     // Navigate back to the product list
-    setTimeout(()=> {
-      this.router.navigateByUrl('/products');
-    }, 200);
+    this.router.navigateByUrl('/products');
+  }
 
+  validate(): void {
+    // Clear the validation object
+    this.dataIsValid = {};
+
+    // 'info' tab
+    if(this.product.productName &&
+      this.product.productName.length >= 3 &&
+      this.product.productCode) {
+      this.dataIsValid['info'] = true;
+     } else {
+      this.dataIsValid['info'] = false;
+     }
+
+    // 'tags' tab
+    if(this.product.category && this.product.category.length >= 3) {
+      this.dataIsValid['tags'] = true;
+     } else {
+      this.dataIsValid['tags'] = false;
+     }
   }
 }
